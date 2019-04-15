@@ -1,0 +1,7 @@
+{
+    "log_level": "DEBUG",
+    "db_host": "marmoset04.shoshin.uwaterloo.ca",
+    "db_user": "j892zhan",
+    "db_password": "12345678",
+    "db_db": "db356_j892zhan"
+}
