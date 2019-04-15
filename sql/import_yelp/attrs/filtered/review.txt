@@ -1,0 +1,8 @@
+business_id,","
+cool,,
+date,","
+funny,,
+review_id,","
+stars,,
+useful,,
+user_id,","

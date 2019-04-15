@@ -1,0 +1,4 @@
+business_id,','
+compliment_count,,
+date,','
+user_id,','

@@ -1,0 +1,8 @@
+average_stars,,
+cool,,
+elite,','
+fans,,
+review_count,,
+useful,,
+user_id,','
+yelping_since,','

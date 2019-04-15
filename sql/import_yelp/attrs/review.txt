@@ -1,0 +1,9 @@
+business_id
+cool
+date
+funny
+review_id
+stars
+text
+useful
+user_id

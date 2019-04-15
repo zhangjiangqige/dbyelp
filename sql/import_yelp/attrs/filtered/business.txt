@@ -1,0 +1,5 @@
+business_id,","
+categories,","
+is_open,,
+review_count,,
+stars,,
