@@ -25,6 +25,16 @@ def connect_db(host, user, password, db):
         raise e
 
 
+def execute(statement):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(statement)
+        connection.commit()
+    except Exception as e:
+        logger.error('Failed to run SQL:\n{}'.format(statement))
+        raise e
+
+
 def exists(model, query):
     res = model.objects.raw(query)
     return res.count() != 0

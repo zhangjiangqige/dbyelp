@@ -1,0 +1,21 @@
+create table business (
+    business_id char(32) not null,
+    categories VARCHAR(1024) default null,
+#     hours__Friday_o time default null,
+#     hours__Friday_c time default null,
+#     hours__Monday_o time default null,
+#     hours__Monday_c time default null,
+#     hours__Saturday_o time default null,
+#     hours__Saturday_c time default null,
+#     hours__Sunday_o time default null,
+#     hours__Sunday_c time default null,
+#     hours__Thursday_o time default null,
+#     hours__Thursday_c time default null,
+#     hours__Tuesday_o time default null,
+#     hours__Tuesday_c time default null,
+#     hours__Wednesday_o time default null,
+#     hours__Wednesday_c time default null,
+    is_open int default 0,
+    review_count int default 0,
+    stars float default 0
+);
