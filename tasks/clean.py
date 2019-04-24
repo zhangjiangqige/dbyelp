@@ -23,14 +23,25 @@ fixes = {
     },
     'remove-user-with-wrong-avg-star': {
         'description': 'Some users have an average star with large difference from that calculated from the table review. This fix removes these kind of user from the tables user and review.',
-        'statement_check': '''
-            select user.user_id, user.average_stars, rev.a_star
-            from user inner join
-            (select user_id, avg(stars) as a_star
-            from review
-            group by user_id) as rev on user.user_id = rev.user_id
-            where abs(user.average_stars - rev.a_star) > 1;
-        ''',
+        'statements_prepare': [
+            'drop table if exists user_with_wrong_average_stars;',
+            '''
+            create table user_with_wrong_average_stars (
+                user_id char(32) not null,
+                average_stars float default 0,
+                review_avg_stars float default 0
+            );''',
+            '''
+            insert into user_with_wrong_average_stars (
+                select user.user_id, user.average_stars, rev.a_star
+                from user inner join
+                (select user_id, avg(stars) as a_star
+                from review group by user_id) as rev
+                on user.user_id = rev.user_id
+                where abs(user.average_stars - rev.a_star) > 1
+            );
+            ''',
+        ],
         'statements': [
             '''
             create table user_tmp (
@@ -78,6 +89,9 @@ def clean(name):
     if name not in fixes:
         return
     fix = fixes[name]
+    if 'statements_prepare' in fix:
+        for s in fix['statements_prepare']:
+            dbutils.execute(s)
     for s in fix['statements']:
         dbutils.execute(s)
 
