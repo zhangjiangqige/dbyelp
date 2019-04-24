@@ -20,3 +20,12 @@ def clean_tasks():
             } for k, v in clean.fixes.items()
         ]
     })
+
+
+@app.route('/clean/run', methods=['POST'])
+def clean_run():
+    task = request.form['task']
+    clean.clean(task)
+    return jsonify({
+        'success': 1
+    })
