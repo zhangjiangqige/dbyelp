@@ -29,3 +29,11 @@ def clean_run():
     return jsonify({
         'success': 1
     })
+
+
+@app.route('/clean/restore', methods=['POST'])
+def clean_restore():
+    clean.restore()
+    return jsonify({
+        'success': 1
+    })
