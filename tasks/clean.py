@@ -96,11 +96,12 @@ def clean(name):
         dbutils.execute(s)
 
 
-def restore(table):
-    with open('sql/tables/{}.sql'.format(table)) as f:
-        stmt = f.read()
-    dbutils.execute('''
-        drop table {};
-        {};
-        insert into {} (select * from {}_ori);
-    '''.format(table, stmt, table, table))
+def restore(tables=['business', 'review', 'tip', 'user']):
+    for t in tables:
+        with open('sql/tables/{}.sql'.format(t)) as f:
+            stmt = f.read()
+        dbutils.execute('''
+            drop table {};
+            {};
+            insert into {} (select * from {}_ori);
+        '''.format(t, stmt, t, t))
