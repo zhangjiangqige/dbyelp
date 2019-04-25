@@ -1,4 +1,10 @@
+import logging
+
 from db import dbutils
+
+
+logger = logging.getLogger(__name__)
+
 
 # Each entry is a fix that may need to be used for the db to work properly
 # e.g. create index
@@ -22,7 +28,7 @@ fixes = {
         ]
     },
     'remove-user-with-wrong-avg-star': {
-        'description': 'Some users have an average star with large difference from that calculated from the table review. This fix removes these kind of user from the tables user and review.',
+        'description': 'Some users have an average star with a large difference between the star calculated from the table review. This fix removes these kind of user from the tables user and review.',
         'statements_prepare': [
             'drop table if exists user_with_wrong_average_stars;',
             '''
@@ -88,6 +94,7 @@ def clean_list():
 def clean(name):
     if name not in fixes:
         return
+    logger.info('running clean task {}'.format(name))
     fix = fixes[name]
     if 'statements_prepare' in fix:
         for s in fix['statements_prepare']:
@@ -98,10 +105,13 @@ def clean(name):
 
 def restore(tables=['business', 'review', 'tip', 'user']):
     for t in tables:
+        logger.info('restoring {}'.format(t))
         with open('sql/tables/{}.sql'.format(t)) as f:
             stmt = f.read()
-        dbutils.execute('''
-            drop table {};
+        queries = '''
+            drop table if exists {};
             {};
-            insert into {} (select * from {}_ori);
-        '''.format(t, stmt, t, t))
+            insert into {} (select * from {}_ori);'''.format(t, stmt, t, t).split(';')
+        for q in queries:
+            if q:
+                dbutils.execute(q)
