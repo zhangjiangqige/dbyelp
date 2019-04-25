@@ -1,7 +1,7 @@
 from app import app
 from flask import jsonify, request
 
-from tasks import clean
+from tasks import clean, validate, analyze
 
 
 @app.route('/')
@@ -34,6 +34,14 @@ def clean_run():
 @app.route('/clean/restore', methods=['POST'])
 def clean_restore():
     clean.restore()
+    return jsonify({
+        'success': 1
+    })
+
+
+@app.route('/validate/split', methods=['POST'])
+def validate_split():
+    validate.split_train_val()
     return jsonify({
         'success': 1
     })
