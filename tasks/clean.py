@@ -29,7 +29,7 @@ fixes = {
     },
     'remove-user-with-wrong-avg-star': {
         'description': 'Some users have an average star with a large difference between the star calculated from the table review. This fix removes these kind of user from the tables user and review.',
-        'statements_prepare': [
+        'statements': [
             'drop table if exists user_with_wrong_average_stars;',
             '''
             create table user_with_wrong_average_stars (
@@ -45,10 +45,7 @@ fixes = {
                 from review group by user_id) as rev
                 on user.user_id = rev.user_id
                 where abs(user.average_stars - rev.a_star) > 1
-            );
-            ''',
-        ],
-        'statements': [
+            );''',
             '''
             create table user_tmp (
                 average_stars float default 0,
@@ -96,14 +93,11 @@ def clean(name):
         return
     logger.info('running clean task {}'.format(name))
     fix = fixes[name]
-    if 'statements_prepare' in fix:
-        for s in fix['statements_prepare']:
-            dbutils.execute(s)
     for s in fix['statements']:
-        dbutils.execute(s)
+        dbutils.execute(s, print=True)
 
 
-def restore(tables=['business', 'review', 'tip', 'user']):
+def restore(tables=['review', 'tip', 'user']):
     for t in tables:
         logger.info('restoring {}'.format(t))
         with open('sql/tables/{}.sql'.format(t)) as f:
@@ -114,4 +108,4 @@ def restore(tables=['business', 'review', 'tip', 'user']):
             insert into {} (select * from {}_ori);'''.format(t, stmt, t, t).split(';')
         for q in queries:
             if q:
-                dbutils.execute(q)
+                dbutils.execute(q, print=True)
