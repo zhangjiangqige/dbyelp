@@ -38,3 +38,8 @@ def split_review():
     ]
     for q in queries:
         dbutils.execute(q, print=True)
+
+
+# return average difference
+def validate_decision_tree():
+    pass
