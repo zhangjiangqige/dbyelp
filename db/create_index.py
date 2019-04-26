@@ -25,7 +25,7 @@ def create(table):
         raise Exception('Table {} is not in db'.format(table))
     logger.debug('creating index for {}'.format(table))
     for s in _statements[table].split(';'):
-        if s:
+        if len(s.strip()) > 0:
             dbutils.execute(s, print=True)
 
 
