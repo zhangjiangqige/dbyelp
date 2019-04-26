@@ -49,6 +49,10 @@ def if_split_end(result_list: list) -> bool:
     result.update(result_list)
     return len(result) == 1
 
+def if_node_end(result_index: list, data_set: list) -> bool:
+    if len(result_index) == len(data_set[0]):
+        return True
+
 def choose_best_future(data_set: list, labels: list, ignore_index: list) -> int:
     result_dict = {}  
     future_num = len(data_set[0])
@@ -68,6 +72,9 @@ class DecisionTreeClass():
 
     def build_tree(self, node: DecisionNode):
         if if_split_end(node.labels):
+            node.results = node.labels[0] 
+            return
+        if if_node_end(node.has_calc_index, node.data_set):
             node.results = node.labels[0] 
             return
         best_index = choose_best_future(node.data_set, node.labels, node.has_calc_index)
@@ -119,9 +126,6 @@ class DecisionTreeClass():
             return self._predict(data_test, node.fb)
 
     def predict(self, data_test):
-        """
-        预测
-        """
         return self._predict(data_test, self.tree_root)
 
 def build(dummy_x, dummy_y):

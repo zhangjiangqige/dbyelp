@@ -26,7 +26,7 @@ def building():
     with dbutils.connection.cursor() as cursor:
         cursor.execute(create_training_view_sql)
         print("create view successfully")
-        cursor.execute("select * from view_training limit 12")
+        cursor.execute("select * from view_training")
         future_list = cursor.fetchall()
         print ("collect successfully")
         cursor.execute(drop_training_view_sql)
@@ -57,9 +57,8 @@ def building():
                 if float(dic_i["useful_prop"]) > l_useful_prop[index] and float(dic_i["useful_prop"]) <= l_useful_prop[index+1]:
                     dic_i["useful_prop"] = str(index)
     vec = DictVectorizer()
-    dummy_x = vec.fit_transform(future_list).toarray()
-
-    D_tree.build(dummy_x, dummy_y)
+    dummy_x = vec.fit_transform(future_list).toarray()    
+    D_tree.build(dummy_x, answer_list)
     print("build successfully")
 
             
