@@ -3,7 +3,6 @@ from sklearn.feature_extraction import DictVectorizer
 
 from db import dbutils
 from tasks import D_tree
-from dbyelp import init
 from tasks import parse_user_input
 
 create_training_view_sql= """\
@@ -19,7 +18,6 @@ drop view view_training;
 """
 
 def building():
-    init()
     L = {'review_count': [0,50,100,9000], 'fans':[0,1000,2000,3000],'average_stars':[0,0.5,1.5,2.5,3.5,4.5,5],'useful_prop':[0,10,15,500]}
     with dbutils.connection.cursor() as cursor:
         cursor.execute(create_training_view_sql)
