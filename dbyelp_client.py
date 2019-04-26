@@ -1,4 +1,6 @@
+import re
 import time
+from pprint import pprint
 
 import requests
 from prompt_toolkit import prompt
@@ -59,8 +61,80 @@ def split_data():
         print_formatted_text('Task failed.')
 
 
+parameters = {
+    'review_count': [(0, 50), (50, 100), (100, float('inf'))],
+    'fans': [(0, 1000), (1000, 2000), (2000, float('inf'))],
+    'useful_prop': [(0, 10), (10, 15), (15, float('inf'))]
+}
+
+
+def set_params():
+    while 1:
+        print_formatted_text(HTML('''<ansiblue>Defaults are:
+review_count: [(0, 50), (50, 100), (100, inf)],
+fans: [(0, 1000), (1000, 2000), (2000, inf)],
+useful_prop: [(0, 10), (10, 15), (15, inf)]
+</ansiblue>'''))
+        print_formatted_text(HTML('''<ansiyellow>Enter the number of action:</ansiyellow>
+0) go back
+1) show current parameters
+2) change review_count
+3) change fans
+4) change useful_prop
+'''))
+        answer = prompt('>> ')
+        try:
+            answer = int(answer)
+            assert 0 <= answer <= 4
+        except:
+            print_formatted_text('Wrong input.')
+            continue
+        if answer == 0:
+            break
+        actions = [
+            None,
+            lambda: pprint(parameters),
+            lambda: update_params('review_count'),
+            lambda: update_params('fans'),
+            lambda: update_params('useful_prop')
+        ]
+        actions[answer]()
+
+
+def update_params(param_name):
+    global parameters
+    valid = re.compile('\[(\(\d+,\d+\),)*\(\d+,(\d+|inf)\)\]')
+    print_formatted_text(HTML('<ansiyellow>Enter new values for {}, e.g. [(0, 10), (10, inf)]:</ansiyellow>'.format(param_name)))
+    answer = prompt('>> ').replace(' ', '')
+    if valid.match(answer) == None:
+        print('Wrong input.')
+    else:
+        answer = answer.replace('inf', 'float("inf")')
+        parameters[param_name] = eval(answer)
+        print_formatted_text('Updated {}'.format(param_name))
+
+
 def train():
-    pass
+    while 1:
+        print_formatted_text(HTML('''<ansiyellow>Enter the number of action:</ansiyellow>
+0) go back
+1) set parameters
+2) train the decision tree
+'''))
+        answer = prompt('>> ')
+        try:
+            answer = int(answer)
+            assert 0 <= answer <= 2
+        except:
+            print_formatted_text('Wrong input.')
+            continue
+        if answer == 0:
+            break
+        elif answer == 1:
+            set_params()
+        else:
+            pass
+
 
 
 def test():
