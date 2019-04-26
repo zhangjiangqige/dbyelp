@@ -1,7 +1,5 @@
 import sys
 from sklearn.feature_extraction import DictVectorizer
-from sklearn import preprocessing
-from sklearn import tree
 
 from db import dbutils
 from tasks import D_tree
