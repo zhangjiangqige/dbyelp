@@ -19,8 +19,8 @@ def split_business():
         'drop table if exists business_val',
         'create table business_train like business',
         'create table business_val like business',
-        'insert into business_train (select * from business limit 100000)',
-        'insert into business_val (select * from business limit 200000 offset 100000)'
+        'insert into business_train (select * from business limit 5000)',
+        'insert into business_val (select * from business limit 5000 offset 5000)'
     ]
     for q in queries:
         dbutils.execute(q, print=True)
@@ -32,6 +32,7 @@ def split_review():
         'drop table if exists review_val;',
         'create table review_train like review;',
         'create table review_val like review;',
+        'alter table review add index (business_id)',
         'insert into review_train (select * from review where business_id in (select business_id from business_train));',
         'insert into review_val (select * from review where business_id in (select business_id from business_val));'
     ]
