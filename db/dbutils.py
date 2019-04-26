@@ -25,9 +25,11 @@ def connect_db(host, user, password, db):
         raise e
 
 
-def execute(statement):
+def execute(statement, print=False):
     try:
         with connection.cursor() as cursor:
+            if print:
+                logger.info('running: {}'.format(statement))
             cursor.execute(statement)
         connection.commit()
     except Exception as e:
