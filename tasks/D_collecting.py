@@ -88,49 +88,53 @@ drop_training_sql = """\
 drop table training;
 """
 
-dbutils.connect_db ("marmoset04.shoshin.uwaterloo.ca", "j892zhan", "12345678", "db356_j892zhan")
+def collecting():
+    dbutils.connect_db ("marmoset04.shoshin.uwaterloo.ca", "j892zhan", "12345678", "db356_j892zhan")
 
-with dbutils.connection.cursor() as cursor:
-    cursor.execute(create_training_sub_sql)
-    print("create traing_sub table successfully")
-    cursor.execute(create_training_sql)
-    print("create training table successfully")
-    cursor.execute(update_review_count_1_sql)
-    cursor.execute(update_review_count_2_sql)
-    cursor.execute(update_review_count_3_sql)
-    print("update review_count column successfully")
-    cursor.execute(update_fans_1_sql)
-    cursor.execute(update_fans_2_sql)
-    cursor.execute(update_fans_3_sql)
-    print("update fans column successfully")
-    cursor.execute(update_useful_prop_1_sql)
-    cursor.execute(update_useful_prop_2_sql)
-    cursor.execute(update_useful_prop_3_sql)
-    print("update useful_prop column successfully")
-    cursor.execute(update_average_stars_0.5_sql)
-    cursor.execute(update_average_stars_1.5_sql)
-    cursor.execute(update_average_stars_2.5_sql)
-    cursor.execute(update_average_stars_3.5_sql)
-    cursor.execute(update_average_stars_4.5_sql)
-    print("update average stars column successfully")
+    with dbutils.connection.cursor() as cursor:
+        cursor.execute(create_training_sub_sql)
+        print("create traing_sub table successfully")
+        cursor.execute(create_training_sql)
+        print("create training table successfully")
+        cursor.execute(update_review_count_1_sql)
+        cursor.execute(update_review_count_2_sql)
+        cursor.execute(update_review_count_3_sql)
+        print("update review_count column successfully")
+        cursor.execute(update_fans_1_sql)
+        cursor.execute(update_fans_2_sql)
+        cursor.execute(update_fans_3_sql)
+        print("update fans column successfully")
+        cursor.execute(update_useful_prop_1_sql)
+        cursor.execute(update_useful_prop_2_sql)
+        cursor.execute(update_useful_prop_3_sql)
+        print("update useful_prop column successfully")
+        cursor.execute(update_average_stars_0.5_sql)
+        cursor.execute(update_average_stars_1.5_sql)
+        cursor.execute(update_average_stars_2.5_sql)
+        cursor.execute(update_average_stars_3.5_sql)
+        cursor.execute(update_average_stars_4.5_sql)
+        print("update average stars column successfully")
 
-    cursor.execute("select count(*) as number from training")
-    result_num = cursor.fetchall()
-    num = result_num[0]["number"]
-    print (num)
-    i = 0
-    future_list = []
-    while(i < num):
-        cursor.execute("select * from training limit 100000 offset %s",i)
-        fetch_list = cursor.fetchall()
-        future_list = future_list + fetch_list
-        i = i + 100000
-    print ("collect successfully")
+        
+def training():
+    with dbutils.connection.cursor() as cursor:
+        cursor.execute("select count(*) as number from training")
+        result_num = cursor.fetchall()
+        num = result_num[0]["number"]
+        print (num)
+        i = 0
+        future_list = []
+        while(i < num):
+            cursor.execute("select * from training limit 100000 offset %s",i)
+            fetch_list = cursor.fetchall()
+            future_list = future_list + fetch_list
+            i = i + 100000
+        print ("collect successfully")
 
-    cursor.execute(drop_training1_sql)
-    cursor.execute(drop_training1_sql)
-    print("drop table successfully")
-    
+        cursor.execute(drop_training1_sql)
+        cursor.execute(drop_training1_sql)
+        print("drop table successfully")
+
     answer_list = []
     for dic_i in future_list:    
         answer_list.append(str(dic_i["review_stars"]))
@@ -152,6 +156,11 @@ with dbutils.connection.cursor() as cursor:
     clf = tree.DecisionTreeClassifier(criterion='entropy')
     clf.fit(dummy_x, dummy_y)
     print("build successfully")
+
+def testing(test_x):
+    predict = clf.predict([test_x])
+    print("predict:", predict)
+
     
     
 
