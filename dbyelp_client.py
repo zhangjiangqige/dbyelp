@@ -2,7 +2,7 @@ import time
 
 import requests
 from prompt_toolkit import prompt
-from prompt_toolkit import print_formatted_text
+from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.shortcuts import ProgressBar
 
 
@@ -16,14 +16,14 @@ base_url = None
 def clean_data():
     tasks = requests.get(base_url + '/clean/tasks').json()['tasks']
     tasks_str = ['''{}) {}
-    {}'''.format(i + 2, t['name'], t['description']) for i, t in enumerate(tasks)]
+    <ansiblue>{}</ansiblue>'''.format(i + 2, t['name'], t['description']) for i, t in enumerate(tasks)]
 
     while 1:
-        print_formatted_text('''Enter the number of the clean task you want to execute, or 0 to go back:
-0) go back to main menu
+        print_formatted_text(HTML('<ansiyellow>Enter the number of the clean task you want to execute, or 0 to go back:</ansiyellow>'))
+        print_formatted_text(HTML('''0) go back to main menu
 1) restore the data
 {}
-'''.format('\n'.join(tasks_str)))
+'''.format('\n'.join(tasks_str))))
         answer = prompt('>> ')
         try:
             answer = int(answer)
@@ -77,13 +77,13 @@ def main():
         lambda: exit(0)
     ]
     while 1:
-        print_formatted_text('''Enter the number of the action you want to do:
+        print_formatted_text(HTML('''<ansiyellow>Enter the number of the action you want to do:</ansiyellow>
 1) clean or restore the data
 2) split the data into training and validation sets (this is going to take a while)
 3) train the decision tree model
 4) run the decision tree model
 5) exit
-''')
+'''))
         answer = prompt('>> ')
         try:
             answer = int(answer)
