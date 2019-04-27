@@ -19,6 +19,8 @@ def initialize(config_file):
             if k in conf:
                 conf[k] = v
     log_level = logging.INFO
+    if conf['log_level'].upper() == 'INFO':
+        log_level = logging.INFO
     if conf['log_level'].upper() == 'DEBUG':
         log_level = logging.DEBUG
     elif conf['log_level'].upper() == 'WARNING':
