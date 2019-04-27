@@ -1,13 +1,13 @@
 import math
 import collections
 
- 
+
 def entropy(rows: list) -> float:
 
     result = collections.Counter()
     result.update(rows)
     rows_len = len(rows)
-    assert rows_len   
+    assert rows_len
     ent = 0.0
     for r in result.values():
         p = float(r) / rows_len
@@ -16,7 +16,7 @@ def entropy(rows: list) -> float:
 
 
 def condition_entropy(future_list: list, result_list: list) -> float:
-    entropy_dict = collections.defaultdict(list)  
+    entropy_dict = collections.defaultdict(list)
     for future, value in zip(future_list, result_list):
         entropy_dict[future].append(value)
     ent = 0.0
@@ -35,13 +35,13 @@ def gain(future_list: list, result_list: list) -> float:
 
 class DecisionNode(object):
     def __init__(self, col=-1, data_set=None, labels=None, results=None, tb=None, fb=None):
-        self.has_calc_index = []    
-        self.col = col              
-        self.data_set = data_set    
-        self.labels = labels        
-        self.results = results      
-        self.tb = tb                
-        self.fb = fb                
+        self.has_calc_index = []
+        self.col = col
+        self.data_set = data_set
+        self.labels = labels
+        self.results = results
+        self.tb = tb
+        self.fb = fb
 
 
 
@@ -55,28 +55,28 @@ def if_node_end(result_index: list, data_set: list) -> bool:
         return True
 
 def choose_best_future(data_set: list, labels: list, ignore_index: list) -> int:
-    result_dict = {}  
+    result_dict = {}
     future_num = len(data_set[0])
     for i in range(future_num):
         if i in ignore_index:
             continue
         future_list = [x[i] for x in data_set]
-        result_dict[i] = gain(future_list, labels) 
+        result_dict[i] = gain(future_list, labels)
     ret = sorted(result_dict.items(), key=lambda x: x[1], reverse=True)
     return ret[0][0]
 
 
 class DecisionTreeClass():
     def __init__(self):
-        self.future_num = 0      
-        self.tree_root = None    
+        self.future_num = 0
+        self.tree_root = None
 
     def build_tree(self, node: DecisionNode):
         if if_split_end(node.labels):
-            node.results = node.labels[0] 
+            node.results = node.labels[0]
             return
         if if_node_end(node.has_calc_index, node.data_set):
-            node.results = node.labels[0] 
+            node.results = node.labels[0]
             return
         best_index = choose_best_future(node.data_set, node.labels, node.has_calc_index)
         node.col = best_index
@@ -132,13 +132,9 @@ class DecisionTreeClass():
     def predict(self, data_test):
         return self._predict(data_test, self.tree_root)
 
+tree = None
+
 def build(dummy_x, dummy_y):
     global tree
     tree = DecisionTreeClass()
     tree.fit(dummy_x, dummy_y)
-
-
-
-
-
-

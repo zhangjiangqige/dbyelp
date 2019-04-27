@@ -4,9 +4,7 @@ from sklearn.feature_extraction import DictVectorizer
 
 from db import dbutils
 from tasks import parse_user_input
-from tasks import D_tree
-
-
+from tasks import D_tree, D_collecting_using_view
 
 
 logger = logging.getLogger(__name__)
@@ -48,9 +46,13 @@ def split_review():
 
 # return average difference
 def validate_decision_tree():
-    L = {'review_count': [0,50,100,9000], 'fans':[0,1000,2000,3000],'average_stars':[0,0.5,1.5,2.5,3.5,4.5,5],'useful_prop':[0,10,15,500]}
-    create_validation_view_sql= """\
-        create view view_validation as 
+    if not D_tree.tree:
+        return None
+
+    L = D_collecting_using_view.split_params
+    logger.info('validate using params: {}'.format(L))
+    create_validation_view_sql = """\
+        create view view_validation as
         (select B.business_id, U.user_id, B.stars, B.review_count, R.stars as review_stars, U.average_stars, U.fans, U.useful/U.review_count as useful_prop
         from business_val B
         join review_val R on B.business_id = R.business_id
@@ -63,10 +65,10 @@ def validate_decision_tree():
 
     with dbutils.connection.cursor() as cursor:
         cursor.execute(create_validation_view_sql)
-        print("create view successfully")
+        logger.info("create view successfully")
         cursor.execute("select * from view_validation")
         validation_list = cursor.fetchall()
-        print ("collect successfully")
+        logger.info("collect successfully")
         cursor.execute(drop_validation_view_sql)
         answer_list = []
         for dic_i in validation_list:
@@ -84,7 +86,7 @@ def validate_decision_tree():
             for index in range(len(l_fans)-1):
                 if int(dic_i["fans"]) > l_fans[index] and int(dic_i["fans"]) <= l_fans[index+1]:
                     dic_i["fans"] = str(index)
-            
+
             l_average_stars = parse_user_input.parse_user_average_stars(L)
             for index in range(len(l_average_stars)-1):
                 if float(dic_i["average_stars"]) > l_average_stars[index] and float(dic_i["average_stars"]) <= l_average_stars[index+1]:
@@ -95,7 +97,7 @@ def validate_decision_tree():
                 if float(dic_i["useful_prop"]) > l_useful_prop[index] and float(dic_i["useful_prop"]) <= l_useful_prop[index+1]:
                     dic_i["useful_prop"] = str(index)
         vec = DictVectorizer()
-        dummy_x = vec.fit_transform(validation_list).toarray()  
+        dummy_x = vec.fit_transform(validation_list).toarray()
         # test_0 = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0,]
         # test = [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,]
         # predict = D_tree.tree.predict(test)
@@ -109,5 +111,5 @@ def validate_decision_tree():
             else:
                 total_error = total_error + abs(answer_list[i] - int(predict))
         average_error = total_error / (len(dummy_x)-count_bad)
-        print ("average error:", str(average_error)) 
-    pass
+        print("average error:", str(average_error))
+    return average_error
