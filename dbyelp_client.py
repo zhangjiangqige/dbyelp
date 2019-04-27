@@ -1,6 +1,7 @@
 import re
+import json
 import time
-from pprint import pprint
+from pprint import pprint, pformat
 
 import requests
 from prompt_toolkit import prompt
@@ -31,7 +32,7 @@ def clean_data():
             answer = int(answer)
             assert 0 <= answer <= len(tasks_str) + 1
         except:
-            print_formatted_text('Wrong input.')
+            print_formatted_text(HTML('<ansired>Wrong input</ansired>'))
             continue
 
         if answer == 0:
@@ -39,42 +40,46 @@ def clean_data():
         if answer == 1:
             resp = requests.post(base_url + '/clean/restore').json()
             if resp['success'] == 1:
-                print_formatted_text('Clean task finished successfully.')
+                print_formatted_text(HTML('<ansired>Clean task finished successfully</ansired>'))
             else:
-                print_formatted_text('Task failed.')
+                print_formatted_text(HTML('<ansired>Task failed</ansired>'))
         else:
             data = {
                 'task': tasks[answer - 2]['name']
             }
             resp = requests.post(base_url + '/clean/run', data=data).json()
             if resp['success'] == 1:
-                print_formatted_text('Clean task finished successfully.')
+                print_formatted_text(HTML('<ansired>Clean task finished successfully</ansired>'))
             else:
-                print_formatted_text('Task failed.')
+                print_formatted_text(HTML('<ansired>Task failed</ansired>'))
 
 
 def split_data():
     resp = requests.post(base_url + '/validate/split').json()
     if resp['success'] == 1:
-        print_formatted_text('Clean task finished successfully.')
+        print_formatted_text(HTML('<ansired>Task finished successfully</ansired>'))
     else:
-        print_formatted_text('Task failed.')
+        print_formatted_text(HTML('<ansired>Task failed</ansired>'))
 
 
 parameters = {
-    'review_count': [(0, 50), (50, 100), (100, float('inf'))],
-    'fans': [(0, 1000), (1000, 2000), (2000, float('inf'))],
-    'useful_prop': [(0, 10), (10, 15), (15, float('inf'))]
+    'review_count': [(0, 50), (50, 100), (100, 9000), (9000, float('inf'))],
+    'fans': [(0, 1000), (1000, 2000), (2000, 3000), (3000, float('inf'))],
+    'useful_prop': [(0, 10), (10, 15), (15, 500), (500, float('inf'))]
+}
+
+parameters_default = {
+    'review_count': [(0, 50), (50, 100), (100, 9000), (9000, float('inf'))],
+    'fans': [(0, 1000), (1000, 2000), (2000, 3000), (3000, float('inf'))],
+    'useful_prop': [(0, 10), (10, 15), (15, 500), (500, float('inf'))]
 }
 
 
 def set_params():
     while 1:
         print_formatted_text(HTML('''<ansiblue>Defaults are:
-review_count: [(0, 50), (50, 100), (100, inf)],
-fans: [(0, 1000), (1000, 2000), (2000, inf)],
-useful_prop: [(0, 10), (10, 15), (15, inf)]
-</ansiblue>'''))
+{}
+</ansiblue>'''.format(pformat(parameters_default))))
         print_formatted_text(HTML('''<ansiyellow>Enter the number of action:</ansiyellow>
 0) go back
 1) show current parameters
@@ -87,7 +92,7 @@ useful_prop: [(0, 10), (10, 15), (15, inf)]
             answer = int(answer)
             assert 0 <= answer <= 4
         except:
-            print_formatted_text('Wrong input.')
+            print_formatted_text(HTML('<ansired>Wrong input</ansired>'))
             continue
         if answer == 0:
             break
@@ -111,7 +116,7 @@ def update_params(param_name):
     else:
         answer = answer.replace('inf', 'float("inf")')
         parameters[param_name] = eval(answer)
-        print_formatted_text('Updated {}'.format(param_name))
+        print_formatted_text(HTML('<ansired>Updated {}</ansired>'.format(param_name)))
 
 
 def train():
@@ -126,19 +131,27 @@ def train():
             answer = int(answer)
             assert 0 <= answer <= 2
         except:
-            print_formatted_text('Wrong input.')
+            print_formatted_text(HTML('<ansired>Wrong input</ansired>'))
             continue
         if answer == 0:
             break
         elif answer == 1:
             set_params()
         else:
-            pass
-
+            data = {
+                'params': json.dumps(parameters)
+            }
+            resp = requests.post(base_url + '/analyze/train', data=data).json()
+            if resp['success'] == 1:
+                print_formatted_text(HTML('<ansired>Training finished successfully</ansired>\n'))
 
 
 def test():
-    pass
+    resp = requests.post(base_url + '/validate/validate').json()
+    if resp['success'] == 1:
+        print_formatted_text(HTML('<ansired>Average error of predicted number of stars: {}</ansired>\n'.format(resp['average_error'])))
+    else:
+        print_formatted_text(HTML('<ansired>Failed: {}</ansired>'.format(resp['msg'])))
 
 
 def main():
@@ -155,7 +168,7 @@ def main():
 1) clean or restore the data
 2) split the data into training and validation sets (this is going to take a while)
 3) train the decision tree model
-4) run the decision tree model
+4) validate the decision tree model
 5) exit
 '''))
         answer = prompt('>> ')
@@ -163,7 +176,7 @@ def main():
             answer = int(answer)
             assert 1 <= answer <= 5
         except:
-            print_formatted_text('Wrong input.')
+            print_formatted_text(HTML('<ansired>Wrong input</ansired>'))
             continue
 
         funcs[answer]()

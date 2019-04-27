@@ -1,8 +1,15 @@
+import json
+import logging
+import pprint
+
 from app import app
 from flask import jsonify, request
 
 from db import create_index
 from tasks import clean, validate, analyze
+
+
+logger = logging.getLogger(__name__)
 
 
 @app.route('/')
@@ -46,4 +53,30 @@ def validate_split():
     create_index.create_all()
     return jsonify({
         'success': 1
+    })
+
+
+@app.route('/analyze/train', methods=['POST'])
+def analyze_train():
+    params = json.loads(request.form['params'])
+    logger.debug('parameters for training: {}'.format(params))
+    analyze.train(params)
+    return jsonify({
+        'success': 1
+    })
+
+
+@app.route('/validate/validate', methods=['POST'])
+def validate_validate():
+    avg_error = validate.validate_decision_tree()
+    if avg_error == None:
+        return jsonify({
+            'success': 0,
+            'msg': 'You must train the model before validating'
+        })
+
+    logger.info('average error: {}'.format(avg_error))
+    return jsonify({
+        'success': 1,
+        'average_error': avg_error
     })
