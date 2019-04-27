@@ -1,5 +1,5 @@
 {
-    "log_level": "DEBUG",
+    "log_level": "INFO",
     "db_host": "marmoset04.shoshin.uwaterloo.ca",
     "db_user": "j892zhan",
     "db_password": "12345678",
