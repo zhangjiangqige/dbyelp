@@ -1,6 +1,7 @@
 import math
 import collections
 
+ 
 def entropy(rows: list) -> float:
 
     result = collections.Counter()
@@ -117,8 +118,11 @@ class DecisionTreeClass():
         self.clear_tree_example_data(self.tree_root)
 
     def _predict(self, data_test: list, node: DecisionNode):
-        if node.results:
-            return node.results
+        if type(node) == type(None):
+            return -1
+        else:
+            if node.results:
+                return node.results
         col = node.col
         if data_test[col]:
             return self._predict(data_test, node.tb)
@@ -129,6 +133,7 @@ class DecisionTreeClass():
         return self._predict(data_test, self.tree_root)
 
 def build(dummy_x, dummy_y):
+    global tree
     tree = DecisionTreeClass()
     tree.fit(dummy_x, dummy_y)
 
