@@ -1,5 +1,11 @@
 # dbyelp
 
+## Team members
+
+Boxin Lyu, 20756975
+
+Jiangqi Zhang, 20766023
+
 ## How to run
 
 Python 3 is required.
